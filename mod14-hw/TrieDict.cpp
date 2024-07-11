@@ -3,13 +3,13 @@
 #include <string>
 
 
-TrieDict::TrieDict()
+TrieNode::TrieNode()
 {
-	_children = new TrieDict * [ALPHABET_SIZE] {nullptr};
+	_children = new TrieNode * [ALPHABET_SIZE] {nullptr};
 }
 
 
-TrieDict::~TrieDict()
+TrieNode::~TrieNode()
 {
 	for (size_t i = 0; i < ALPHABET_SIZE; ++i)
 	{
@@ -19,15 +19,15 @@ TrieDict::~TrieDict()
 }
 
 
-bool TrieDict::_isValidSymbol(char c)
+bool TrieNode::_isValidSymbol(char c)
 {
 	return (c >= 'a' && c <= 'z');
 }
 
 
-void TrieDict::insert(const std::string& key)
+void TrieNode::insert(const std::string& key)
 {
-	TrieDict* node = this;
+	TrieNode* node = this;
 
 	for (size_t i = 0; i < key.length(); i++)
 	{
@@ -37,7 +37,7 @@ void TrieDict::insert(const std::string& key)
 		size_t index = key[i] - 'a';
 
 		if (!node->_children[index])
-			node->_children[index] = new TrieDict();
+			node->_children[index] = new TrieNode();
 
 		node = node->_children[index];
 	}
@@ -45,9 +45,9 @@ void TrieDict::insert(const std::string& key)
 	node->_isEndOfWord = true;
 }
 
-TrieDict* TrieDict::search(const std::string& key)
+TrieNode* TrieNode::search(const std::string& key)
 {
-	TrieDict* node = this;
+	TrieNode* node = this;
 
 	for (size_t i = 0; i < key.length(); i++)
 	{
@@ -64,7 +64,7 @@ TrieDict* TrieDict::search(const std::string& key)
 	return node;
 }
 
-bool TrieDict::isEmpty() const
+bool TrieNode::isEmpty() const
 {
 	for (size_t i = 0; i < ALPHABET_SIZE; i++)
 		if (this->_children[i])
@@ -73,32 +73,10 @@ bool TrieDict::isEmpty() const
 }
 
 
-void TrieDict::learnWords()
-{
-	const std::string dict[10]{
-		"asd",
-		"qwe",
-		"rty",
-		"zxc",
-		"fgh",
-		"asdfgh",
-		"vbn",
-		"qwerty",
-		"zxcvbn",
-		"apple"
-	};
-	for (const auto& w : dict)
-	{
-		insert(w);
-	}
-	return;
-}
-
-
-std::string TrieDict::predict(const std::string& input)
+std::string TrieNode::predict(const std::string& input)
 {
 	std::string result = input;
-	TrieDict* node = search(input);
+	TrieNode* node = search(input);
 	if (node == nullptr) return result;
 	while (node != nullptr && !node->_isEndOfWord)
 	{
@@ -117,3 +95,44 @@ std::string TrieDict::predict(const std::string& input)
 	}
 	return result;
 }
+
+
+TrieDict::TrieDict()
+{
+	_root = new TrieNode();
+}
+
+
+TrieDict::~TrieDict()
+{
+	delete _root;
+}
+
+
+void TrieDict::learnWords()
+{
+	const std::string dict[10] {
+		"asd",
+		"qwe",
+		"rty",
+		"zxc",
+		"fgh",
+		"asdfgh",
+		"vbn",
+		"qwerty",
+		"zxcvbn",
+		"apple"
+	};
+	for (const auto& w : dict)
+	{
+		_root->insert(w);
+	}
+	return;
+}
+
+
+std::string TrieDict::predict(const std::string& input)
+{
+	return _root->predict(input);
+}
+

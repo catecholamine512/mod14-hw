@@ -5,18 +5,30 @@
 const int ALPHABET_SIZE = 26;
 
 
-class TrieDict {
-	TrieDict** _children = nullptr;
+class TrieNode
+{
+	TrieNode** _children = nullptr;
 	bool _isEndOfWord = false;
 
-	bool _isValidSymbol(char c);
+	static bool _isValidSymbol(char c);
+
+public:
+	TrieNode();
+	~TrieNode();
+	void insert(const std::string& key);
+	TrieNode* search(const std::string& key);
+	bool isEmpty() const;
+	std::string predict(const std::string& input);
+};
+
+
+class TrieDict
+{
+	TrieNode* _root = nullptr;
 
 public:
 	TrieDict();
 	~TrieDict();
-	void insert(const std::string& key);
-	TrieDict* search(const std::string& key);
-	bool isEmpty() const;
 	void learnWords();
 	std::string predict(const std::string& input);
 };
